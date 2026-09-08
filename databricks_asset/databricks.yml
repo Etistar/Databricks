@@ -1,0 +1,44 @@
+
+bundle:
+  name: databricks_asset
+  uuid: d639e4a9-9f37-4590-b281-c9b197976eff
+
+include:
+  - resources/*.yml
+
+
+# Variable declarations. These variables are assigned in the dev/prod targets below.
+variables:
+  catalog:
+    description: The catalog to use
+  schema:
+    description: The schema to use
+
+targets:
+  dev:   
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-8fa9a6f5-64cb.cloud.databricks.com
+    variables:
+      catalog: workspace
+      schema: ${workspace.current_user.short_name}
+    permissions:
+      - group_name: admins
+        level: CAN_MANAGE
+    presets:
+      name_prefix: ${workspace.current_user.short_name}
+      source_linked_deployment: false
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-8fa9a6f5-64cb.cloud.databricks.com
+      # We explicitly deploy to /Workspace/Users/zononetienne2009@gmail.com to make sure we only have a single copy.
+     # root_path: /Workspace/Users/zononetienne2009@gmail.com/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: workspace
+      schema: prod
+    permissions:
+      - user_name: zononetienne2009@gmail.com
+        level: CAN_MANAGE
